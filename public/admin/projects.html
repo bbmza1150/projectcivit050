@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects</title>
+    <link rel="stylesheet" href="/CSS/table_project.css">
+    <link rel="stylesheet" href="/CSS/header.css">
+</head>
+<body>
+    <div class="header">
+        <div class="logo-container">
+            <img src="/assets/images/TSU.png" alt="TSU Logo">
+            <img src="/assets/images/SMP.png" alt="SMP Logo">
+        </div>
+        <div>
+            <h2>โครงการ วมว. - มอ.ทักษิณ</h2>
+            <p>โครงการห้องวิทยาศาสตร์ในโรงเรียนป่าพะยอมพิทยาคม โดยการกำกับดูแลมหาลับทักษิณ</p>
+        </div>
+        <div class="admin-info dropdown">
+            <span id="adminName"></span>
+            <img src="/assets/icons/admin-icon.png" alt="Admin Icon">
+            <div class="dropdown-content">
+                <a href="/admin/profile">Profile</a>
+                <a href="#" onclick="logout()">Log out</a>
+            </div>
+        </div>
+    </div>
+
+    <h2>รายการโครงการ <img src="/assets/icons/to-do-list.png" alt="Add Icon" style="height: 40px; width: 40px;"> </h2> 
+    <button class="add-button" onclick="window.location.href = '/admin/add/project';">
+        ADD
+        <img src="/assets/icons/add.png" alt="Add Icon">
+    </button>
+
+    <table id="projectsTable">
+        <thead>
+            <tr>
+                <th>ลำดับ</th> <!-- New Rank column -->
+                <th>รหัสโครงการ</th>
+                <th>ชื่อโครงการ</th>
+                <th>วันเปิดรับสมัคร</th>
+                <th>วันปิดรับสมัคร</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Data rows will be inserted here dynamically -->
+        </tbody>
+    </table>
+
+    <script>
+
+         // Logout function
+         function logout() {
+            localStorage.removeItem('accessToken'); // Clear the token
+            localStorage.removeItem('userName'); // Clear the username
+            window.location.href = '/smp/sci/tsu'; // Redirect to login page after logout
+        }
+        function formatDate(dateString) {
+            const options = {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false // Use 24-hour format
+            };
+            const date = new Date(dateString);
+            return date.toLocaleString('en-GB', options); // 'en-GB' for DD-MM-YYYY HH:mm:ss
+        }
+
+        async function fetchProjects() {
+            const accessToken = localStorage.getItem('accessToken');
+
+            if (!accessToken) {
+                alert('Access token not found. Please login again.');
+                window.location.href = '/smp/sci/tsu'; // Redirect to login page
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/admin/projects', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const table = document.getElementById('projectsTable');
+                    data.forEach((project , index)=> {
+                        const row = table.insertRow();
+                        row.insertCell(0).textContent = index + 1; // Rank column
+                        row.insertCell(1).textContent = project.project_id;
+                        row.insertCell(2).textContent = project.project_name;
+                        row.insertCell(3).textContent = formatDate(project.project_start_date);
+                        row.insertCell(4).textContent = formatDate(project.project_expiration_date);
+                        
+                        const actionsCell = row.insertCell(5);
+                        actionsCell.innerHTML = `
+                            <span class="action-icons">
+                                <img src="/assets/icons/research.png" onclick="viewProject('${project.project_id}')" title="View">
+                                
+                            </span>
+                        `;
+                    });
+                } else {
+                    throw new Error('Unauthorized or error fetching project data');
+                }
+            } catch (error) {
+                console.error('Error fetching project data:', error);
+                alert('Error fetching project data: ' + error.message);
+                window.location.href = '/smp/sci/tsu'; 
+            }
+        }
+
+        function viewProject(projectId) {
+            window.location.href = `/admin/project/view/?id=${projectId}`;
+        }
+
+    
+        
+        // Set admin name on page load
+        document.getElementById('adminName').textContent = localStorage.getItem('userName');
+
+        fetchProjects();
+    </script>
+</body>
+</html>

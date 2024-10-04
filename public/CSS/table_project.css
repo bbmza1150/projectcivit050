@@ -1,0 +1,57 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+
+
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table, th, td {
+    border: 1px solid black;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background-color: #FFEAEA; /* Light pink background for headers */
+}
+
+td {
+    background-color: #F7F0F0; /* Light pink background for table cells */
+}
+
+.add-button {
+    background-color: #4CAF50; /* Green button color */
+    color: white;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    margin-left: auto; /* Align the button to the right */
+}
+
+.add-button img {
+    margin-left: 10px;
+    height: 20px;
+}
+
+.action-icons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.action-icons img {
+    width: 35px;
+    height: 35px;
+}
+
